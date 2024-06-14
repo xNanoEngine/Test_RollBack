@@ -66,18 +66,18 @@ pipeline {
                         bat "docker-compose -f docker-compose.yml up -d"
                         sleep time: 30, unit: 'SECONDS'
                         // Verify the deployment
-                        def result = bat(script: 'docker ps --filter "name=backend" --filter "status=running" -q', returnStdout: true).trim()
+                        def containerId = bat(script: 'docker ps --filter "name=backend" --filter "status=running" -q', returnStdout: true).trim()
 
-                        echo "Resultado de docker ps: '${result}'"  // Debug para verificar la salida
+                        echo "Resultado de docker ps: '${containerId}'"  // Debug para verificar la salida
 
-                        if (result) {
+                        if (containerId) {
                             echo 'El contenedor "backend" está en ejecución.'
                         } else {
                             echo 'El contenedor "backend" no está en ejecución o no se encontraron contenedores.'
                             currentBuild.result = 'FAILURE'
                             rollback()
                         }
-                    
+                        
                     } catch (Exception e) {
                         echo "Error durante el despliegue: ${e.message}"
                         currentBuild.result = 'FAILURE'
