@@ -41,9 +41,9 @@ pipeline {
                         bat "docker-compose -f docker-compose.yml up -d"
                         
                         // Verify the deployment
-                        def result = bat(script: 'docker ps --filter "name=backend-1" --filter "status=exited" -q', returnStatus: true)
+                        def result = bat(script: 'docker ps --filter "name=backend" --filter "status=exited" -q', returnStatus: true)
                         if (result == 0) {
-                            echo 'El contenedor "backend-1" falló al iniciar.'
+                            echo 'El contenedor "backend" falló al iniciar.'
                             currentBuild.result = 'FAILURE'
                             // Execute rollback
                             rollback()
