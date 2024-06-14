@@ -63,6 +63,10 @@ pipeline {
                     try {
 
                         // Deploy using docker-compose.yml
+                        bat "docker-compose -f docker-compose.yml up -d"
+                        sleep time: 15, unit: 'SECONDS'
+                        // Verify the deployment
+                        // Deploy using docker-compose.yml
                         def containerId = sh(script: 'docker ps --filter "name=backend" --filter "status=running" -q', returnStdout: true).trim()
                         echo "Resultado de docker ps: '${containerId}'"
 
@@ -73,7 +77,6 @@ pipeline {
                             currentBuild.result = 'FAILURE'
                             rollback()
                         }
-
                         
                     } catch (Exception e) {
                         echo "Error durante el despliegue: ${e.message}"
