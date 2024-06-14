@@ -65,7 +65,7 @@ pipeline {
                         bat "docker-compose -f docker-compose.yml up -d"
                         
                         // Verify the deployment
-                        def result = bat(script: 'docker ps --filter "name=backend" --filter "status=running" -q', returnStatus: true).trim()
+                        def result = bat(script: 'docker ps --filter "name=backend" --filter "status=running" -q', returnStdout: true).trim()
 
                         if (result) {
                             echo 'El contenedor "backend" está en ejecución.'
