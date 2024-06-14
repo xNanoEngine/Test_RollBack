@@ -70,7 +70,7 @@ pipeline {
 
                         echo "Resultado de docker ps: '${containerId}'"  // Debug para verificar la salida
 
-                        if (containerId) {
+                        if (containerId == 0) {
                             echo 'El contenedor "backend" está en ejecución.'
                         } else {
                             echo 'El contenedor "backend" no está en ejecución o no se encontraron contenedores.'
