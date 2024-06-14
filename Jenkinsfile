@@ -13,10 +13,8 @@ pipeline {
             steps {
                 script {
                     // Limpiar contenedores que puedan estar corriendo
-                    bat "docker-compose -f docker-compose.yml down --remove-orphans"
+                    bat "docker-compose -f docker-compose.yml down --rmi all --remove-orphans"
                     
-                    // Limpiar imágenes anteriores si es necesario
-                    bat "docker rmi -f $(docker images -q)"
                 }
             }
         }
