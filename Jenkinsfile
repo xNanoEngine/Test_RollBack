@@ -2,7 +2,7 @@ pipeline {
     agent any
 
     environment {
-        DOCKER_IMAGE = 'test_info290_rollback'
+        DOCKER_IMAGE = 'nombre_de_la_imagen'
         DEPLOY_VERSION = 'latest'
         ROLLBACK_VERSION = 'v1'
     }
@@ -61,6 +61,7 @@ pipeline {
     post {
         always {
             script {
+                echo "Limpieza y finalización de la ejecución del pipeline."
                 // Clean up if necessary
             }
         }
