@@ -65,7 +65,7 @@ pipeline {
                         bat "docker-compose -f docker-compose.yml up -d"
                         
                         // Verify the deployment
-                        def healthCheck = sh(script: "curl -s -o /dev/null -w \"%{http_code}\" http://localhost:${PORT}/health", returnStdout: true).trim()
+                        def healthCheck = bat(script: "curl http://localhost:${APP_PORT}/health -o /dev/null -w \"%{http_code}\"", returnStatus: true).trim()
 
                         if (healthCheck == '200') {
                             echo 'La aplicación está funcionando correctamente.'
