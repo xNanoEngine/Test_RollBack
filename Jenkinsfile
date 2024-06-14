@@ -15,7 +15,7 @@ pipeline {
                 script {
                     // Limpiar contenedores que puedan estar corriendo
                     bat "docker-compose -f docker-compose.yml down --rmi all --remove-orphans"
-                    
+                    bat "docker-compose -f docker-compose.rollback.yml down --remove-orphans"
                 }
             }
         }
