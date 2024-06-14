@@ -2,9 +2,8 @@ pipeline {
     agent any
 
     environment {
-        docker_image = 'test_info290-backend'
-        docker_container = 'test_info290'
-        docker_port = 3000
+        docker_compose_version = '2.27.1'  // Versión de Docker Compose a utilizar
+        docker_compose_project = 'nombre_del_proyecto'  // Nombre del proyecto de Docker Compose
     }
 
     stages {
@@ -17,27 +16,20 @@ pipeline {
         stage('Build and Deploy') {
             steps {
                 script {
-                    // Construir la imagen Docker
-                    bat "docker build -t ${env.docker_image} ."
+                    // Verificar la versión de Docker Compose
+                    bat "docker-compose version"
 
-                    // Subir la imagen Docker (opcional)
-                    bat "docker push ${env.docker_image}"
+                    // Iniciar servicios definidos en docker-compose.yml
+                    bat "docker-compose -f docker-compose.yml up -d"
+                }
+            }
+        }
 
-                    // Detener y eliminar cualquier contenedor existente
-                    bat "docker stop ${env.docker_container} || true"
-                    bat "docker rm ${env.docker_container} || true"
-
-                    // Ejecutar el contenedor Docker en segundo plano con PowerShell
-                    powershell """
-                    Start-Process docker -ArgumentList 'run -d -p ${env.docker_port}:${env.docker_port} --name ${env.docker_container} ${env.docker_image}' -NoNewWindow -Wait
-                    """
-
-                    // Verificar si el despliegue fue exitoso
-                    def result = bat(script: "docker inspect --format='{{.State.Status}}' ${env.docker_container}", returnStatus: true)
-
-                    if (result != 0) {
-                        error "Error: No se pudo iniciar el contenedor con la nueva versión."
-                    }
+        stage('Verify Deployment') {
+            steps {
+                script {
+                    // Verificar el estado de los servicios
+                    bat "docker-compose -f docker-compose.yml ps"
                 }
             }
         }
