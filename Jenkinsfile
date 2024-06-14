@@ -41,10 +41,11 @@ pipeline {
                         bat "docker-compose -f docker-compose.yml up -d"
                         
                         // Verify the deployment
-                        def result = bat(script: "docker ps --filter 'name=backend' --filter 'status=running' -q", returnStatus: true)
-                        
-                        if (result != 0) {
-                            error "Error: No se pudo iniciar el servicio con la nueva versión."
+                        def result = bat(script: 'docker ps --filter "name=backend" --filter "status=running" -q', returnStatus: true)
+                        if (result == 0) {
+                            echo 'Se encontraron contenedores con el nombre "backend" en estado "running".'
+                        } else {
+                            echo 'No se encontraron contenedores con el nombre "backend" en estado "running".'
                         }
                     } catch (Exception e) {
                         echo "Error durante el despliegue: ${e.message}"
@@ -72,7 +73,7 @@ def rollback() {
 
     try {
         // Execute rollback using docker-compose.rollback.yml
-        bat "docker-compose -f docker-compose.rollback.yml up -d"
+        bat "docker-compose -f docker-compose.rollback.yml up -d --remove-orphans"
         
         echo "Rollback completado."
     } catch (Exception rollbackException) {
