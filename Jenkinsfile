@@ -64,7 +64,7 @@ pipeline {
 
                         // Deploy using docker-compose.yml
                         bat "docker-compose -f docker-compose.yml up -d"
-                        sleep time: 30, unit: 'SECONDS'
+                        sleep time: 15, unit: 'SECONDS'
                         // Verify the deployment
                         def containerId = bat(script: 'docker ps --filter "name=backend" --filter "status=running" -q', returnStdout: true).trim()
 
