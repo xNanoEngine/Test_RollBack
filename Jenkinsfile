@@ -67,14 +67,17 @@ pipeline {
                         sleep time: 15, unit: 'SECONDS'
                         // Verify the deployment
                         // Deploy using docker-compose.yml
-                        def containerId = sh(script: 'docker ps --filter "name=backend" --filter "status=running" -q', returnStdout: true).trim()
+                       // Verificar el estado del contenedor 'backend'
+                        def containerId = bat(script: 'docker ps --filter "name=backend" --filter "status=running" -q', returnStdout: true).trim()
                         echo "Resultado de docker ps: '${containerId}'"
-
-                        if (containerId) {
+                        
+                        // Verificar si el contenedor está en ejecución
+                        if (!containerId.isEmpty()) {
                             echo 'El contenedor "backend" está en ejecución.'
                         } else {
                             echo 'El contenedor "backend" no está en ejecución o no se encontraron contenedores.'
                             currentBuild.result = 'FAILURE'
+                            // Aquí podrías añadir lógica adicional para manejar el fallo
                             rollback()
                         }
                         
