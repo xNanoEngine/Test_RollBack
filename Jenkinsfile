@@ -67,10 +67,12 @@ pipeline {
                         // Verify the deployment
                         def result = bat(script: 'docker ps --filter "name=backend" --filter "status=running" -q', returnStdout: true).trim()
 
+                        echo "Resultado de docker ps: '${result}'"  // Debug para verificar la salida
+
                         if (result) {
                             echo 'El contenedor "backend" está en ejecución.'
                         } else {
-                            echo 'El contenedor "backend" no está en ejecución.'
+                            echo 'El contenedor "backend" no está en ejecución o no se encontraron contenedores.'
                             currentBuild.result = 'FAILURE'
                             rollback()
                         }
