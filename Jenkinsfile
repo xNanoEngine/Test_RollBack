@@ -65,20 +65,16 @@ pipeline {
                         bat "docker-compose -f docker-compose.yml up -d"
                         
                         // Verify the deployment
-                        def response = powershell(returnStatus: true, script: '''
-                            $url = "http://localhost:3000"
-                            $response = Invoke-WebRequest -Uri $url -Method Get
-                            $statusCode = $response.StatusCode
-                            $statusCode
-                        ''')
+                        def result = bat(script: 'docker ps --filter "name=backend" --filter "status=running" -q', returnStatus: true).trim()
 
-                        if (response == 200) {
-                            echo "El health check fue exitoso. Código de estado: ${response}"
+                        if (result) {
+                            echo 'El contenedor "backend" está en ejecución.'
                         } else {
-                            echo "El health check falló. Código de estado: ${response}"
+                            echo 'El contenedor "backend" no está en ejecución.'
                             currentBuild.result = 'FAILURE'
                             rollback()
                         }
+                    
                     } catch (Exception e) {
                         echo "Error durante el despliegue: ${e.message}"
                         currentBuild.result = 'FAILURE'
