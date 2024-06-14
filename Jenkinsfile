@@ -40,12 +40,16 @@ pipeline {
                         // Deploy using docker-compose.yml
                         bat "docker-compose -f docker-compose.yml up -d"
                         
+                        // Delay to allow containers to start
+                        sleep(time: 30, unit: 'SECONDS')
+
                         // Verify the deployment
                         def result = bat(script: 'docker ps --filter "name=backend" --filter "status=running" -q', returnStatus: true)
                         if (result == 0) {
                             echo 'Se encontraron contenedores con el nombre "backend" en estado "running".'
                         } else {
                             echo 'No se encontraron contenedores con el nombre "backend" en estado "running".'
+                            error "El contenedor 'backend' no está en estado 'running'."
                         }
                     } catch (Exception e) {
                         echo "Error durante el despliegue: ${e.message}"
