@@ -5,6 +5,7 @@ pipeline {
         DOCKER_IMAGE = 'xnanoengine/test_info290_rollback'
         DEPLOY_VERSION = 'latest'
         ROLLBACK_VERSION = 'v1'
+        PORT = 3000
     }
 
     stages {
@@ -32,7 +33,21 @@ pipeline {
                 }
             }
         }
-
+        stage('Check Port Availability') {
+            steps {
+                script {
+                    // Verificar si hay algo corriendo en el puerto deseado (ejemplo: 3000)
+                    def result = bat(script: "docker ps --format '{{.Ports}}' | grep '0.0.0.0:${PORT}->${PORT}/tcp'", returnStatus: true)
+                    if (result == 0) {
+                        echo "¡Advertencia! El puerto ${PORT} ya está ocupado por otro contenedor o servicio."
+                        currentBuild.result = 'FAILURE'
+                        // Puedes decidir aquí si deseas detener Jenkins o continuar con precaución
+                    } else {
+                        echo "El puerto ${PORT} está disponible para desplegar."
+                    }
+                }
+            }
+        }
         stage('Deploy') {
             steps {
                 script {
