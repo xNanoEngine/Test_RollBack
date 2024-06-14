@@ -9,12 +9,37 @@ pipeline {
     }
 
     stages {
+        stage('Clean Environment') {
+            steps {
+                script {
+                    // Limpiar contenedores que puedan estar corriendo
+                    bat "docker-compose -f docker-compose.yml down --remove-orphans"
+                    
+                    // Limpiar imágenes anteriores si es necesario
+                    bat "docker rmi -f $(docker images -q)"
+                }
+            }
+        }
         stage('Checkout') {
             steps {
                 checkout scm
             }
         }
-
+        stage('Check Port Availability') {
+            steps {
+                script {
+                    // Verificar si hay algo corriendo en el puerto deseado (ejemplo: 3000)
+                    def result = bat(script: "docker ps --format '{{.Ports}}' | grep '0.0.0.0:${PORT}->${PORT}/tcp'", returnStatus: true)
+                    if (result == 0) {
+                        echo "¡Advertencia! El puerto ${PORT} ya está ocupado por otro contenedor o servicio."
+                        currentBuild.result = 'FAILURE'
+                        // Puedes decidir aquí si deseas detener Jenkins o continuar con precaución
+                    } else {
+                        echo "El puerto ${PORT} está disponible para desplegar."
+                    }
+                }
+            }
+        }
         stage('Build Docker Image') {
             steps {
                 script {
@@ -33,21 +58,7 @@ pipeline {
                 }
             }
         }
-        stage('Check Port Availability') {
-            steps {
-                script {
-                    // Verificar si hay algo corriendo en el puerto deseado (ejemplo: 3000)
-                    def result = bat(script: "docker ps --format '{{.Ports}}' | grep '0.0.0.0:${PORT}->${PORT}/tcp'", returnStatus: true)
-                    if (result == 0) {
-                        echo "¡Advertencia! El puerto ${PORT} ya está ocupado por otro contenedor o servicio."
-                        currentBuild.result = 'FAILURE'
-                        // Puedes decidir aquí si deseas detener Jenkins o continuar con precaución
-                    } else {
-                        echo "El puerto ${PORT} está disponible para desplegar."
-                    }
-                }
-            }
-        }
+        
         stage('Deploy') {
             steps {
                 script {
