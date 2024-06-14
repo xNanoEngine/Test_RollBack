@@ -68,17 +68,21 @@ pipeline {
                         // Verify the deployment
                         // Deploy using docker-compose.yml
                        // Verificar el estado del contenedor 'backend'
-                        def containerId = bat(script: 'docker ps --filter "name=backend" --filter "status=running" -q', returnStdout: true).trim()
+                        def result = bat(script: 'docker ps --filter "name=backend" --filter "status=running" -q', returnStdout: true).trim()
+                    
+                        // Limpiar la salida, eliminando posibles líneas de comandos adicionales
+                        def containerId = result.split('\n').find { it =~ /^[a-f0-9]{12}$/ }?.trim()
+
                         echo "Resultado de docker ps: '${containerId}'"
                         
                         // Verificar si el contenedor está en ejecución
-                        if (!containerId.isEmpty()) {
+                        if (containerId) {
                             echo 'El contenedor "backend" está en ejecución.'
                         } else {
                             echo 'El contenedor "backend" no está en ejecución o no se encontraron contenedores.'
                             currentBuild.result = 'FAILURE'
-                            // Aquí podrías añadir lógica adicional para manejar el fallo
                             rollback()
+                            // Aquí podrías añadir lógica adicional para manejar el fallo
                         }
                         
                     } catch (Exception e) {
