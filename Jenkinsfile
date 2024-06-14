@@ -3,7 +3,7 @@ pipeline {
 
     environment {
         docker_compose_version = '2.27.1'  // Versión de Docker Compose a utilizar
-        docker_compose_project = 'nombre_del_proyecto'  // Nombre del proyecto de Docker Compose
+        docker_compose_project = 'test_info290_rollback'  // Nombre del proyecto de Docker Compose
     }
 
     stages {
