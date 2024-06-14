@@ -2,7 +2,7 @@ pipeline {
     agent any
 
     environment {
-        DOCKER_IMAGE = 'nombre_de_la_imagen'
+        DOCKER_IMAGE = 'test_info290_rollback'
         DEPLOY_VERSION = 'latest'
         ROLLBACK_VERSION = 'v1'
     }
@@ -25,10 +25,9 @@ pipeline {
 
         stage('Push Docker Image') {
             steps {
-                script {
-                    // Push the image with the latest tag
-                    docker.withRegistry('', 'dockerhub-credentials') {
-                        dockerImage.push()
+                 script {
+                    docker.withRegistry('https://index.docker.io/v1/', 'dockerhub-credentials') {
+                        dockerImage.push("${DEPLOY_VERSION}")
                     }
                 }
             }
