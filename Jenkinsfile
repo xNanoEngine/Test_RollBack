@@ -2,7 +2,7 @@ pipeline {
     agent any
 
     environment {
-        DOCKER_IMAGE = 'test_info290_rollback'
+        DOCKER_IMAGE = 'xnanoengine/test_info290_rollback'
         DEPLOY_VERSION = 'latest'
         ROLLBACK_VERSION = 'v1'
     }
@@ -25,7 +25,7 @@ pipeline {
 
         stage('Push Docker Image') {
             steps {
-                 script {
+                script {
                     docker.withRegistry('https://index.docker.io/v1/', 'dockerhub-credentials') {
                         dockerImage.push("${DEPLOY_VERSION}")
                     }
