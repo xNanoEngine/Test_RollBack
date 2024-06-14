@@ -1,12 +1,6 @@
 pipeline {
     agent any
 
-    environment {
-        DOCKER_IMAGE = 'test_info290'
-        CONTAINER_NAME = 'test_info290'
-        PORT = 3000
-    }
-
     stages {
         stage('Checkout') {
             steps {
@@ -14,27 +8,29 @@ pipeline {
             }
         }
 
-        stage('Build and Deploy Initial Version') {
+        stage('Build and Deploy') {
             steps {
                 script {
                     // Construir la imagen Docker
-                    sh "docker build -t $DOCKER_IMAGE ."
+                    bat "docker build -t nombre_de_la_imagen ."
 
                     // Subir la imagen Docker (opcional)
-                    sh "docker push $DOCKER_IMAGE"
+                    bat "docker push nombre_de_la_imagen"
 
                     // Detener y eliminar cualquier contenedor existente
-                    sh "docker stop $CONTAINER_NAME || true"
-                    sh "docker rm $CONTAINER_NAME || true"
+                    bat "docker stop nombre_del_contenedor || true"
+                    bat "docker rm nombre_del_contenedor || true"
 
-                    // Ejecutar el contenedor Docker con la nueva versión
-                    sh "docker run -d -p $PORT:$PORT --name $CONTAINER_NAME $DOCKER_IMAGE"
+                    // Ejecutar el contenedor Docker en segundo plano con PowerShell
+                    powershell """
+                    Start-Process docker -ArgumentList 'run -d -p 3000:3000 --name nombre_del_contenedor nombre_de_la_imagen' -NoNewWindow -Wait
+                    """
 
                     // Verificar si el despliegue fue exitoso
-                    def result = sh "docker inspect --format='{{.State.Status}}' $CONTAINER_NAME"
+                    def result = bat(script: "docker inspect --format='{{.State.Status}}' nombre_del_contenedor", returnStatus: true)
 
-                    if (result != 'running') {
-                        error "Error: No se pudo iniciar el contenedor con la primera versión."
+                    if (result != 0) {
+                        error "Error: No se pudo iniciar el contenedor con la nueva versión."
                     }
                 }
             }
