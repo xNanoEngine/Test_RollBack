@@ -65,16 +65,15 @@ pipeline {
                         bat "docker-compose -f docker-compose.yml up -d"
                         
                         // Verify the deployment
-                        def healthCheck = bat(script: "curl http://localhost:${PORT}/health -o /dev/null -w \"%{http_code}\"", returnStatus: true).trim()
+                        def healthCheck = bat(script: "curl http://localhost:${APP_PORT}/health --write-out %{http_code} --silent --output /tmp/healthcheck.txt", returnStatus: true)
 
-                        if (healthCheck == '200') {
+                        if (healthCheck == 200) {
                             echo 'La aplicación está funcionando correctamente.'
                         } else {
-                            echo 'La aplicación no está respondiendo correctamente.'
+                            echo "La aplicación no está respondiendo correctamente. Código de estado: ${healthCheck}"
                             currentBuild.result = 'FAILURE'
                             rollback()
                         }
-
                     } catch (Exception e) {
                         echo "Error durante el despliegue: ${e.message}"
                         currentBuild.result = 'FAILURE'
