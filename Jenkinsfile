@@ -42,14 +42,16 @@ pipeline {
                         
                         // Verify the deployment
                         def result = bat(script: 'docker ps --filter "name=backend" -q', returnStatus: true)
-                        if (result == 0) {
-                            echo 'El contenedor "backend" falló al iniciar.'
+
+                        if (result != 0) {
+                            echo 'El contenedor "backend" no está en ejecución.'
                             currentBuild.result = 'FAILURE'
-                            // Execute rollback
+                            // Ejecutar rollback si es necesario
                             rollback()
                         } else {
                             echo 'Despliegue exitoso.'
                         }
+
                     } catch (Exception e) {
                         echo "Error durante el despliegue: ${e.message}"
                         currentBuild.result = 'FAILURE'
