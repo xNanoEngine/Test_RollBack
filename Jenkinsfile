@@ -65,12 +65,17 @@ pipeline {
                         bat "docker-compose -f docker-compose.yml up -d"
                         
                         // Verify the deployment
-                        def healthCheck = bat(script: "curl http://localhost:${PORT} --write-out %{http_code} --silent --output /tmp/healthcheck.txt", returnStatus: true)
+                        def response = powershell(returnStatus: true, script: '''
+                            $url = "http://localhost:3000"
+                            $response = Invoke-WebRequest -Uri $url -Method Get
+                            $statusCode = $response.StatusCode
+                            $statusCode
+                        ''')
 
-                        if (healthCheck == 200) {
-                            echo 'La aplicación está funcionando correctamente.'
+                        if (response == 200) {
+                            echo "El health check fue exitoso. Código de estado: ${response}"
                         } else {
-                            echo "La aplicación no está respondiendo correctamente. Código de estado: ${healthCheck}"
+                            echo "El health check falló. Código de estado: ${response}"
                             currentBuild.result = 'FAILURE'
                             rollback()
                         }
