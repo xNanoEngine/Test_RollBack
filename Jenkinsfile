@@ -61,9 +61,10 @@ pipeline {
             steps {
                 script {
                     try {
+
                         // Deploy using docker-compose.yml
                         bat "docker-compose -f docker-compose.yml up -d"
-                        
+                        sleep time: 30, unit: 'SECONDS'
                         // Verify the deployment
                         def result = bat(script: 'docker ps --filter "name=backend" --filter "status=running" -q', returnStdout: true).trim()
 
