@@ -6,6 +6,7 @@ pipeline {
         DEPLOY_VERSION = 'latest'
         ROLLBACK_VERSION = 'v1'
         PORT = 3000
+
     }
 
     stages {
@@ -46,7 +47,6 @@ pipeline {
                 }
             }
         }
-
         stage('Push Docker Image') {
             steps {
                 script {
@@ -65,15 +65,14 @@ pipeline {
                         bat "docker-compose -f docker-compose.yml up -d"
                         
                         // Verify the deployment
-                        def result = bat(script: 'docker ps --filter "name=backend" -q', returnStatus: true)
+                        def healthCheck = sh(script: "curl -s -o /dev/null -w \"%{http_code}\" http://localhost:${PORT}/health", returnStdout: true).trim()
 
-                        if (result != 0) {
-                            echo 'El contenedor "backend" no está en ejecución.'
-                            currentBuild.result = 'FAILURE'
-                            // Ejecutar rollback si es necesario
-                            rollback()
+                        if (healthCheck == '200') {
+                            echo 'La aplicación está funcionando correctamente.'
                         } else {
-                            echo 'Despliegue exitoso.'
+                            echo 'La aplicación no está respondiendo correctamente.'
+                            currentBuild.result = 'FAILURE'
+                            rollback()
                         }
 
                     } catch (Exception e) {
@@ -86,7 +85,6 @@ pipeline {
             }
         }
     }
-
     post {
         always {
             script {
