@@ -5,8 +5,10 @@ const PORT = process.env.PORT || 3000;
 app.get("/", (req, res) => {
   res.send("¡Hola Mundo!");
 });
+
+res;
+aaa;
 app.get("/error", (req, res) => {
-  res;
   aaa;
   res.send("¡Error resuelto!");
 });
