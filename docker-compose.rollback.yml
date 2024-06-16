@@ -1,6 +1,6 @@
 version: '3.8'
 services:
-  app:
+  backend:
     image: xnanoengine/test_info290_rollback:v1
     ports:
       - "3000:3000"
